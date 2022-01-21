@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <!-- Credit Card -->
+    <event name="payment_method_assign_data_paypalplus_brasil_creditcard">
+        <observer name="paypalplus_brasil_creditcard_data_assign" instance="Paypal\PaypalPlusBrasil\Observer\CreditCard\DataAssignObserver" />
+    </event>
+    <event name="paypalplus_brasil_creditcard_remembered_card_token">
+        <observer name="paypalplus_brasil_creditcard_remembered_card_token" instance="Paypal\PaypalPlusBrasil\Observer\CreditCard\SaveRememberCardTokenObserver" />
+    </event>
+
+    <event name="checkout_submit_all_after">
+        <observer name="paypalplus_brasil_creditcard_create_invoice" instance="Paypal\PaypalPlusBrasil\Observer\CreditCard\CreateInvoiceObserver"/>
+    </event>
+
+    <event name="order_cancel_after">
+        <observer name="paypalplus_brasil_creditcard_after_cancel" instance="Paypal\PaypalPlusBrasil\Observer\CreditCard\UpdateAfterCancel"/>
+    </event>
+
+</config>

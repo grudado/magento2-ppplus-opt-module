@@ -1,0 +1,28 @@
+<?php
+/**
+ * @var \Magento\Framework\Escaper $escaper
+ * @var \Paypal\PaypalPlusBrasil\Block\Info\PaypalPlusCreditcard $block
+ */
+$additionalInformation = $block->getInfo()->getAdditionalInformation();
+$sale = $additionalInformation['related_resources']['sale']
+?>
+
+<h4><?= $escaper->escapeHtml($block->getMethod()->getTitle()) ?></h4>
+
+<p>
+    <strong><?php echo __('Transaction ID') ?></strong>
+    <br>
+    <?= $escaper->escapeHtml($sale['id']) ?>
+</p>
+
+<p>
+    <strong><?php echo __('Transaction Status') ?></strong>
+    <br>
+    <?= $escaper->escapeHtml(__($sale['state'])) ?>
+</p>
+
+<p>
+    <strong><?= __("Installments"); ?></strong>
+    <br>
+    <?= $escaper->escapeHtml($additionalInformation['installments'] . 'x') ?>
+</p>

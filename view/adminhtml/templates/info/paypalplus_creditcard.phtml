@@ -1,0 +1,91 @@
+<?php
+/**
+ * @var \Magento\Framework\Escaper $escaper
+ * @var \Paypal\PaypalPlusBrasil\Block\Info\PaypalPlusCreditcard $block
+ */
+$additionalInformation = $block->getInfo()->getAdditionalInformation();
+$sale = $additionalInformation['related_resources']['sale']
+?>
+<style>
+    .refund-title {
+        margin: 3rem 0 1rem;
+
+    }
+</style>
+<h3><?= $escaper->escapeHtml($block->getMethod()->getTitle()) ?></h3>
+<p>
+    <strong><?php echo __('Transaction ID') ?></strong>
+    <br>
+    <?= $escaper->escapeHtml($sale['id']) ?>
+</p>
+
+<p>
+    <strong><?php echo __('Transaction Status') ?></strong>
+    <br>
+    <?= $escaper->escapeHtml(__($sale['state'])) ?>
+</p>
+
+<p>
+    <strong><?php echo __('Pay ID') ?></strong>
+    <br>
+    <?= $escaper->escapeHtml($additionalInformation['pay_id']) ?>
+</p>
+
+<p>
+    <strong><?php echo __('Payer ID') ?></strong>
+    <br>
+    <?= $escaper->escapeHtml($additionalInformation['payer_id']) ?>
+</p>
+
+<p>
+    <strong><?php echo __('Payment Request Link') ?></strong>
+    <br>
+    <?php
+    $paymentLink = $block->getUrl(
+        'paypalplusbrasil/paymentrequest/view',
+        ['payment_id' => $additionalInformation['pay_id']]
+    )
+    ?>
+    <a href="<?= $paymentLink ?>" target="_blank"><?= __("See Payment Request") ?></a>
+</p>
+
+<p>
+    <strong><?php echo __('Payment Sale Link') ?></strong>
+    <br>
+    <?php
+    $saleLink = $block->getUrl(
+        'paypalplusbrasil/paymentsale/view',
+        ['sale_id' => $sale['id']]
+    )
+    ?>
+    <a href="<?= $saleLink ?>" target="_blank"><?= __("See Payment Sale") ?></a>
+</p>
+
+<p>
+    <strong><?= __("Installments"); ?></strong>
+    <br>
+    <?= $escaper->escapeHtml($additionalInformation['installments'] . 'x') ?>
+</p>
+
+<?php if (isset($additionalInformation['refund'])): ?>
+<?php $refundIdx = 1 ?>
+    <h3 class="refund-title"><?= __("Refunds") ?></h3>
+    <?php foreach ($additionalInformation['refund'] as $refund): ?>
+        <p><strong><?php echo __("Refund %1 info", $refundIdx); $refundIdx++ ?></strong></p>
+        <p>
+            <strong><?= __("Refund ID"); ?></strong>
+            <br>
+            <?= $escaper->escapeHtml($refund['id']) ?>
+        </p>
+        <p>
+            <strong><?= __("Refund State"); ?></strong>
+            <br>
+            <?= $escaper->escapeHtml(__($refund['state'])) ?>
+        </p>
+        <p>
+            <strong><?= __("Refund Amount"); ?></strong>
+            <br>
+            <?= $escaper->escapeHtml($block->formatCurrency($refund['amount']['total'])) ?>
+        </p>
+    <?php endforeach; ?>
+<?php endif; ?>

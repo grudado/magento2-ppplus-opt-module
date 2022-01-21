@@ -1,0 +1,186 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+
+    <preference for="Paypal\PaypalPlusBrasil\Api\Webhook\WebhookManagementInterface" type="Paypal\PaypalPlusBrasil\Gateway\Webhook\WebhookManagement"/>
+
+    <!-- Order initial status -->
+    <type name="Magento\Sales\Model\Order\Payment\State\AuthorizeCommand">
+        <plugin name="paypal_paypalplus_brasil_plugin_initial_order_status" type="Paypal\PaypalPlusBrasil\Plugin\Sales\Model\Order\Payment\State\AuthorizeCommandPlugin"/>
+    </type>
+
+    <type name="Magento\Sales\Model\Order\Payment\State\CaptureCommand">
+        <plugin name="paypal_paypalplus_plugin_capture_order_status" type="Paypal\PaypalPlusBrasil\Plugin\Sales\Model\Order\Payment\State\CaptureCommandPlugin" />
+    </type>
+
+    <type name="Paypal\PaypalPlusBrasil\Logger\Handler">
+        <arguments>
+            <argument name="filesystem" xsi:type="object">Magento\Framework\Filesystem\Driver\File</argument>
+        </arguments>
+    </type>
+    <type name="Paypal\PaypalPlusBrasil\Logger\Logger">
+        <arguments>
+            <argument name="name" xsi:type="string">paypalPlusLogger</argument>
+            <argument name="handlers"  xsi:type="array">
+                <item name="debug" xsi:type="object">Paypal\PaypalPlusBrasil\Logger\Handler</item>
+            </argument>
+        </arguments>
+    </type>
+
+    <!-- === Cartão de Crédito === -->
+
+    <!-- Method Facade -->
+    <virtualType name="PayPalPaypalPlusBrasilCreditCardFacade" type="Magento\Payment\Model\Method\Adapter">
+        <arguments>
+            <argument name="code" xsi:type="const">\Paypal\PaypalPlusBrasil\Model\Ui\CreditCard\ConfigProvider::CODE</argument>
+            <argument name="formBlockType" xsi:type="string">Paypal\PaypalPlusBrasil\Block\Form\PaypalPlusCreditcard</argument>
+            <argument name="infoBlockType" xsi:type="string">Paypal\PaypalPlusBrasil\Block\Info\PaypalPlusCreditcard</argument>
+            <argument name="valueHandlerPool" xsi:type="object">PayPalPaypalPlusBrasilCreditCardValueHandlerPool</argument>
+            <argument name="validatorPool" xsi:type="object">PayPalPaypalPlusBrasilCreditCardValidatorPool</argument>
+            <argument name="commandPool" xsi:type="object">PayPalPaypalPlusBrasilCreditCardCommandPool</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Command Pool -->
+    <virtualType name="PayPalPaypalPlusBrasilCreditCardCommandPool" type="Magento\Payment\Gateway\Command\CommandPool">
+        <arguments>
+            <argument name="commands" xsi:type="array">
+                <item name="authorize" xsi:type="string">PayPalPaypalPlusBrasilCreditCardAuthorizeCommand</item>
+                <item name="sale" xsi:type="string">PayPalPaypalPlusBrasilCreditCardAuthorizeCommand</item>
+                <item name="refund" xsi:type="string">PayPalPaypalPlusBrasilCreditCardRefundCommand</item>
+                <item name="capture" xsi:type="string">PayPalPaypalPlusBrasilCreditCardCaptureStrategyCommand</item>
+                <item name="settlement" xsi:type="string">PayPalPaypalPlusBrasilCreditCardCaptureCommand</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Authorize Command -->
+    <virtualType name="PayPalPaypalPlusBrasilCreditCardAuthorizeCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">PayPalPaypalPlusBrasilCreditCardAuthorizationRequest</argument>
+            <argument name="transferFactory" xsi:type="object">Paypal\PaypalPlusBrasil\Gateway\CreditCard\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">Paypal\PaypalPlusBrasil\Gateway\CreditCard\Http\Transaction\TransactionAuthorization</argument>
+            <argument name="validator" xsi:type="object">Paypal\PaypalPlusBrasil\Gateway\CreditCard\Validator\AuthorizationValidator</argument>
+            <argument name="handler" xsi:type="object">PayPalPaypalPlusBrasilCreditCardAuthorizationResponseHandler</argument>
+            <argument name="errorMessageMapper" xsi:type="object">Paypal\PaypalPlusBrasil\Gateway\MessageMapper</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Authorize Request Builder Composite -->
+    <virtualType name="PayPalPaypalPlusBrasilCreditCardAuthorizationRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="payer" xsi:type="string">Paypal\PaypalPlusBrasil\Gateway\CreditCard\Request\PayerDataBuilder</item>
+                <item name="bncode" xsi:type="string">Paypal\PaypalPlusBrasil\Gateway\CreditCard\Request\BnCodeDataBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Authorize Response Handler Composite -->
+    <virtualType name="PayPalPaypalPlusBrasilCreditCardAuthorizationResponseHandler" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="authorization" xsi:type="string">Paypal\PaypalPlusBrasil\Gateway\CreditCard\Response\AuthorizationHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Capture Command -->
+    <virtualType name="PayPalPaypalPlusBrasilCreditCardCaptureCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">PayPalPaypalPlusBrasilCreditCardCaptureRequest</argument>
+            <argument name="transferFactory" xsi:type="object">Paypal\PaypalPlusBrasil\Gateway\CreditCard\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">Paypal\PaypalPlusBrasil\Gateway\CreditCard\Http\Transaction\TransactionCapture</argument>
+            <argument name="validator" xsi:type="object">Paypal\PaypalPlusBrasil\Gateway\CreditCard\Validator\CaptureValidator</argument>
+            <argument name="handler" xsi:type="object">PayPalPaypalPlusBrasilCreditCardCaptureResponseHandler</argument>
+            <argument name="errorMessageMapper" xsi:type="object">Paypal\PaypalPlusBrasil\Gateway\MessageMapper</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Capture Strategy Command definition -->
+    <virtualType name="PayPalPaypalPlusBrasilCreditCardCaptureStrategyCommand" type="Paypal\PaypalPlusBrasil\Gateway\Command\CaptureStrategyCommand">
+        <arguments>
+            <argument name="commandPool" xsi:type="object">PayPalPaypalPlusBrasilCreditCardCommandPool</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Capture Request Builder Composite -->
+    <virtualType name="PayPalPaypalPlusBrasilCreditCardCaptureRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="capture" xsi:type="string">Paypal\PaypalPlusBrasil\Gateway\CreditCard\Request\CaptureDataBuilder</item>
+                <item name="bncode" xsi:type="string">Paypal\PaypalPlusBrasil\Gateway\CreditCard\Request\BnCodeDataBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Capture Response Handler Composite -->
+    <virtualType name="PayPalPaypalPlusBrasilCreditCardCaptureResponseHandler" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="capture" xsi:type="string">Paypal\PaypalPlusBrasil\Gateway\CreditCard\Response\CaptureHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Refund Command -->
+    <virtualType name="PayPalPaypalPlusBrasilCreditCardRefundCommand" type="Magento\Payment\Gateway\Command\GatewayCommand">
+        <arguments>
+            <argument name="requestBuilder" xsi:type="object">PayPalPaypalPlusBrasilCreditCardRefundRequest</argument>
+            <argument name="transferFactory" xsi:type="object">Paypal\PaypalPlusBrasil\Gateway\CreditCard\Http\TransferFactory</argument>
+            <argument name="client" xsi:type="object">Paypal\PaypalPlusBrasil\Gateway\CreditCard\Http\Transaction\TransactionRefund</argument>
+            <argument name="validator" xsi:type="object">Paypal\PaypalPlusBrasil\Gateway\CreditCard\Validator\RefundValidator</argument>
+            <argument name="handler" xsi:type="object">PayPalPaypalPlusBrasilCreditCardRefundResponseHandler</argument>
+            <argument name="errorMessageMapper" xsi:type="object">Paypal\PaypalPlusBrasil\Gateway\MessageMapper</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Refund Request Builder Composite -->
+    <virtualType name="PayPalPaypalPlusBrasilCreditCardRefundRequest" type="Magento\Payment\Gateway\Request\BuilderComposite">
+        <arguments>
+            <argument name="builders" xsi:type="array">
+                <item name="refund" xsi:type="string">Paypal\PaypalPlusBrasil\Gateway\CreditCard\Request\RefundDataBuilder</item>
+                <item name="bncode" xsi:type="string">Paypal\PaypalPlusBrasil\Gateway\CreditCard\Request\BnCodeDataBuilder</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Refund Response Handler Composite -->
+    <virtualType name="PayPalPaypalPlusBrasilCreditCardRefundResponseHandler" type="Magento\Payment\Gateway\Response\HandlerChain">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="refund" xsi:type="string">Paypal\PaypalPlusBrasil\Gateway\CreditCard\Response\RefundHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Value Handlers -->
+    <virtualType name="PayPalPaypalPlusBrasilCreditCardValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
+        <arguments>
+            <argument name="handlers" xsi:type="array">
+                <item name="default" xsi:type="string">PayPalPaypalPlusBrasilCreditCardValueHandler</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PayPalPaypalPlusBrasilCreditCardValueHandler" type="Magento\Payment\Gateway\Config\ConfigValueHandler">
+        <arguments>
+            <argument name="configInterface" xsi:type="object">PayPalPaypalPlusBrasilCreditCardConfig</argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Validators Pool -->
+    <virtualType name="PayPalPaypalPlusBrasilCreditCardValidatorPool" type="Magento\Payment\Gateway\Validator\ValidatorPool">
+        <arguments>
+            <argument name="validators" xsi:type="array">
+                <item name="country" xsi:type="string">Paypal\PaypalPlusBrasil\Gateway\Validator\CountryValidator</item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+    <!-- Config Interface -->
+    <virtualType name="PayPalPaypalPlusBrasilCreditCardConfig" type="Paypal\PaypalPlusBrasil\Gateway\CreditCard\Config\Config">
+        <arguments>
+            <argument name="methodCode" xsi:type="const">Paypal\PaypalPlusBrasil\Model\Ui\CreditCard\ConfigProvider::CODE</argument>
+        </arguments>
+    </virtualType>
+
+</config>

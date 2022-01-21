@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<include xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_include.xsd">
+    <group id="integration" translate="label" type="text" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+        <label>PayPal Plus Integration</label>
+
+        <field id="mode" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Integration mode</label>
+            <source_model>Paypal\PaypalPlusBrasil\Model\Config\Source\IntegrationMode</source_model>
+            <config_path>paypalplus_brasil/integration/mode</config_path>
+        </field>
+
+        <field id="sandbox_client_id" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Client ID (sandbox mode)</label>
+            <config_path>paypalplus_brasil/integration/sandbox_client_id</config_path>
+            <depends>
+                <field id="mode">sandbox</field>
+            </depends>
+        </field>
+
+        <field id="sandbox_secret" translate="label" type="obscure" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Secret (sandbox mode)</label>
+            <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+            <config_path>paypalplus_brasil/integration/sandbox_secret</config_path>
+            <depends>
+                <field id="mode">sandbox</field>
+            </depends>
+        </field>
+
+        <field id="production_client_id" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Client ID (production mode)</label>
+            <config_path>paypalplus_brasil/integration/production_client_id</config_path>
+            <depends>
+                <field id="mode">production</field>
+            </depends>
+        </field>
+
+        <field id="production_secret" translate="label" type="obscure" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Secret (production mode)</label>
+            <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
+            <config_path>paypalplus_brasil/integration/production_secret</config_path>
+            <depends>
+                <field id="mode">production</field>
+            </depends>
+        </field>
+
+        <field id="order_pending_status" translate="label" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Initial status for pending orders</label>
+            <source_model>Paypal\PaypalPlusBrasil\Model\Config\Source\PaymentReview</source_model>
+            <config_path>paypalplus_brasil/integration/order_pending_status</config_path>
+            <comment>Status linked for 'payment_review' state</comment>
+        </field>
+
+        <field id="order_complete_status" translate="label" type="select" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Initial status for complete orders</label>
+            <source_model>Paypal\PaypalPlusBrasil\Model\Config\Source\Processing</source_model>
+            <config_path>paypalplus_brasil/integration/order_complete_status</config_path>
+            <comment>Status linked for 'processing' state</comment>
+        </field>
+
+        <field id="create_invoice_by_webhook" translate="label" type="select" sortOrder="75" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Create Invoice By Webhook</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>paypalplus_brasil/integration/create_invoice_by_webhook</config_path>
+            <comment>If 'Yes', invoice will be created when receive 'PAYMENT.SALE.COMPLETED' webhook event. If 'No', invoice will be created after order create.</comment>
+        </field>
+
+        <field id="webhook_event_types" translate="label" type="multiselect" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Webhook event types</label>
+            <source_model>Paypal\PaypalPlusBrasil\Model\Config\Source\WebhookEventTypes</source_model>
+            <config_path>paypalplus_brasil/integration/webhook_event_types</config_path>
+        </field>
+
+        <field id="save_webhook_event_types" translate="label" sortOrder="90" showInDefault="1" showInWebsite="0" showInStore="0">
+            <frontend_model>Paypal\PaypalPlusBrasil\Block\Adminhtml\System\Config\SaveWebhook</frontend_model>
+        </field>
+
+        <field id="debug" translate="label" type="select" sortOrder="999" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Enable debug</label>
+            <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+            <config_path>paypalplus_brasil/integration/debug</config_path>
+            <comment>Log debug informations to var/log/paypalplus_brasil.log</comment>
+        </field>
+    </group>
+</include>

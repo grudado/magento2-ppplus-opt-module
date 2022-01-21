@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<csp_whitelist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Csp:etc/csp_whitelist.xsd">
+    <policies>
+        <policy id="base-uri">
+            <values>
+                <value id="paypal_com" type="host">https://www.paypal.com</value>
+                <value id="paypal_objects_com_unsecure" type="host">http://www.paypalobjects.com</value>
+                <value id="paypal_objects_com_secure" type="host">https://www.paypalobjects.com</value>
+            </values>
+        </policy>
+        <policy id="frame-src">
+            <values>
+                <value id="paypal_com" type="host">*.paypal.com</value>
+                <value id="paypal_objects_com" type="host">*.paypalobjects.com</value>
+            </values>
+        </policy>
+        <policy id="connect-src">
+            <values>
+                <value id="paypal_com" type="host">*.paypal.com</value>
+                <value id="paypal_objects_com" type="host">*.paypalobjects.com</value>
+            </values>
+        </policy>
+        <policy id="script-src">
+            <values>
+                <value id="paypal_com" type="host">*.paypal.com</value>
+                <value id="paypal_objects_com" type="host">*.paypalobjects.com</value>
+            </values>
+        </policy>
+        <policy id="img-src">
+            <values>
+                <value id="paypal_com" type="host">*.paypal.com</value>
+                <value id="paypal_objects_com" type="host">*.paypalobjects.com</value>
+            </values>
+        </policy>
+        <policy id="form-action">
+            <values>
+                <value id="paypal_com" type="host">*.paypal.com</value>
+                <value id="sandbox_paypal_com" type="host">*.sandbox.paypal.com</value>
+            </values>
+        </policy>
+    </policies>
+</csp_whitelist>
