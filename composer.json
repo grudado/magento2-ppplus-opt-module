@@ -1,6 +1,7 @@
 {
     "name": "paypal/paypal-plus-brasil",
     "description": "N/A",
+    "version": "1.0.0",
     "type": "magento2-module",
     "license": [
         "OSL-3.0",
